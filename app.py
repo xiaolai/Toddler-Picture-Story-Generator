@@ -8,8 +8,6 @@ import requests
 from dotenv import load_dotenv
 
 load_dotenv()
-client = OpenAI()
-# Set your OpenAI API key
 
 # Step 1: Function to generate a 100-word story
 def generate_story(prompt):
@@ -24,8 +22,8 @@ def generate_story(prompt):
     return response.choices[0].message.content.strip()
 
 # Step 2: Function to generate images using DALL-E
-def generate_images_with_dalle(story, size="1024x1024"):
-    dalle_prompt = f"""Generate an image based on the following story: \n\n'{story}'\n\n The style should be simple and playful, with soft, warm colors. The image should be suitable for a 2-year-old child, with clear, easy-to-recognize elements. Ensure that the scene evokes warmth, friendliness, and is rich in visual storytelling, but not overly complex. The composition should be balanced and visually engaging, with a focus on creating a comforting and imaginative atmosphere for storytelling."""
+def generate_images_with_dalle(story, image_prompt, size="1024x1024"):
+    dalle_prompt = f"{image_prompt}\n\nStory: '{story}'"
     response = client.images.generate(
         model="dall-e-3",
         prompt=dalle_prompt,
@@ -65,11 +63,43 @@ def save_image(image_url):
 # Step 4: Streamlit web app interface
 st.title("Toddler Picture Story Generator")
 
+
+
+# Function to load API key from .env file
+def load_api_key_from_env():
+    load_dotenv()
+    return os.getenv("OPENAI_API_KEY")
+
+# Streamlit widget for API key input
+api_key_source = st.radio("Choose OpenAI API Key source:", ("Load from .env", "Enter manually"))
+
+if api_key_source == "Load from .env":
+    api_key = load_api_key_from_env()
+    if not api_key:
+        st.error("No API key found in .env file. Please enter it manually.")
+        api_key = st.text_input("Enter your OpenAI API key:", type="password")
+else:
+    api_key = st.text_input("Enter your OpenAI API key:", type="password")
+
+# Initialize OpenAI client with the API key
+if api_key:
+    client = OpenAI(api_key=api_key)
+else:
+    st.error("Please provide a valid OpenAI API key to proceed.")
+
+    
 # Text input for story prompt
 story_idea = st.text_area("Please input the Story Idea, keywords or short sentence:", height=50)
 
-# Text area to display prompt template
-story_prompt = f"""Create a simple story of about 100 words in American English, based on the following ideas:\n\n```\n{story_idea}\n```\n\n Make sure the story suitable for 2-3 year-old toddlers. Use plain and everyday vocabulary, short sentences, and preferably has some rhyming lines."""
+# Text area to display and modify prompt template
+default_story_prompt = f"""Create a simple story of about 100 words in American English, based on the following ideas:\n\n```\n{story_idea}\n```\n\n Make sure the story suitable for 2-3 year-old toddlers. Use plain and everyday vocabulary, short sentences, and preferably has some rhyming lines."""
+
+story_prompt = st.text_area("Modify the story prompt if needed:", value=default_story_prompt, height=210)
+
+# Text area to display and modify image prompt template
+default_image_prompt = """Generate an image based on the following story. The style should be simple and playful, with soft, warm colors. The image should be suitable for a 2-year-old child, with clear, easy-to-recognize elements. Ensure that the scene evokes warmth, friendliness, and is rich in visual storytelling, but not overly complex. The composition should be balanced and visually engaging, with a focus on creating a comforting and imaginative atmosphere for storytelling."""
+
+image_prompt = st.text_area("Modify the image prompt if needed:", value=default_image_prompt, height=150)
 
 # List of voices for selection
 voices = [
@@ -121,7 +151,7 @@ def generate_story_content():
 # Function to generate image
 def generate_image_content():
     if st.session_state.story:
-        st.session_state.image_url = generate_images_with_dalle(st.session_state.story)
+        st.session_state.image_url = generate_images_with_dalle(st.session_state.story, image_prompt)
         image_file = save_image(st.session_state.image_url)
         st.session_state.image_version += 1
     else:
@@ -133,22 +163,22 @@ def generate_audio_content():
         if st.session_state.audio_file:
             os.remove(st.session_state.audio_file)
         st.session_state.audio_file = generate_audio_sync(st.session_state.story, selected_voice)
-        # st.write(f"Audio saved to: {st.session_state.audio_file}")
         st.session_state.last_voice = selected_voice
         st.session_state.last_story = st.session_state.story
         st.session_state.audio_version += 1
     else:
         st.write("Please generate a story first.")
 
-# Buttons to generate individual components
-if st.button('Generate/Regenerate Story'):
+# Button to generate all components
+if st.button('Generate Story, Image, and Audio'):
     generate_story_content()
     generate_image_content()
     generate_audio_content()
 
 # Display story in a text area with auto-adjusting height
-story_lines = st.session_state.story.count('\n') + 1
-st.text_area("Generated Story:", value=st.session_state.story, height=story_lines * 25, key="story_display", max_chars=None)
+if st.session_state.story:
+    story_lines = st.session_state.story.count('\n') + 1
+    st.text_area("Generated Story:", value=st.session_state.story, height=story_lines * 25, key="story_display", max_chars=None)
 
 # Display image with a frame
 if st.session_state.image_url:
