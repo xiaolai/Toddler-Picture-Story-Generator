@@ -1,0 +1,5 @@
+streamlit
+openai
+python-dotenv
+edge_tts
+requests
