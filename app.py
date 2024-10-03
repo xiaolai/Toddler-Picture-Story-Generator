@@ -152,7 +152,7 @@ st.text_area("Generated Story:", value=st.session_state.story, height=story_line
 
 # Display image with a frame
 if st.session_state.image_url:
-    st.image(st.session_state.image_url, use_column_width=True, caption="Generated Image")
+    st.image(st.session_state.image_url, use_column_width=True)
 
 if st.button('Regenerate Image'):
     generate_image_content()
