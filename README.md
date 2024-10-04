@@ -3,7 +3,7 @@
 
 This Streamlit web application generates simple, engaging stories for toddlers, complete with images and audio narration. It uses OpenAI's GPT-4o-mini for story generation, DALL-E for image creation, and Edge TTS for audio narration.
 
-这个Streamlit网络应用程序为幼儿生成简单、有趣的故事，配有图片和音频讲述。它使用OpenAI的GPT-4o-mini进行故事生成，DALL-E创建图像，以及Edge TTS进行音频讲述。
+这个 Streamlit 网络应用程序为幼儿生成简单、有趣的故事，配有图片和音频讲述。它使用 OpenAI 的 GPT-4o-mini 进行故事生成，DALL-E 创建图像，以及 Edge TTS 进行音频讲述。
 
 ## Features
 ## 功能
