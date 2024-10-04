@@ -118,7 +118,7 @@ else:
 story_idea = st.text_area("Please input the Story Idea, keywords or short sentence:", height=50)
 
 # Text area to display and modify prompt template
-default_story_prompt = f"""Create a simple story of about 100 words in American English, based on the following ideas:\n\n```\n{story_idea}\n```\n\n Make sure the story suitable for 2-3 year-old toddlers. Use plain and everyday vocabulary, short sentences, and preferably has some rhyming lines."""
+default_story_prompt = f"""Create a simple story of about 100 words in American English, based on the following ideas:\n\n```\n{story_idea}\n```\n\n Make sure the story suitable for 2-3 year-old toddlers. Always try to use simple, basic, short words, short sentences, and preferably has some rhyming lines."""
 
 story_prompt = st.text_area("Modify the story prompt if needed:", value=default_story_prompt, height=210)
 
