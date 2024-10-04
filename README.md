@@ -36,6 +36,18 @@ This Streamlit web application generates simple, engaging stories for toddlers, 
 ## Installation
 ## 安装
 
+0. Install Miniconda and VSCode:
+   安装 Miniconda 和 VsCode：
+   ```
+   brew install miniconda visual-studio-code
+   ```
+   If you are unfamiliar with "Terminal", Homebrew, and VSCode applications, please visit these links:
+   如果对 “终端”、Homebrew 以及 VSCode 程序不了解的话，请访问这些链接:
+   > * https://github.com/xiaolai/apple-computer-literacy
+   > * https://github.com/xiaolai/apple-computer-literacy/blob/main/start-from-terminal.md
+   > * https://github.com/xiaolai/apple-computer-literacy/blob/main/vscode.md
+
+
 1. Clone the repository:
    克隆仓库：
    ```
