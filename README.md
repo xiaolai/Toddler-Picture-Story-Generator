@@ -91,6 +91,9 @@ This Streamlit web application generates simple, engaging stories for toddlers, 
 6. Use the "Regenerate Image" and "Regenerate Audio" buttons to create new versions of these elements if desired.
    如果需要，使用"重新生成图像"和"重新生成音频"按钮来创建这些元素的新版本。
 
+7. Additionally, if you're using VSCode editor, you can use the `Shift+Command+P` shortcut, then select `Tasks: Run Task`, and finally choose `Run Streamlit App`.
+   另外，如果你使用 VSCode 编辑器，可以在使用 `Shift+Command+P` 快捷键之后，选择 `Tasks: Run Task`，而后选择 `Run Streamlit App`。
+
 ## How It Works
 ## 工作原理
 
