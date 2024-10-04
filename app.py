@@ -6,6 +6,9 @@ import os
 from datetime import datetime
 import requests
 from dotenv import load_dotenv
+from typing import Literal
+
+ImageSize = Literal["1024x1024", "1792x1024", "1024x1792"]
 
 load_dotenv()
 
@@ -23,7 +26,7 @@ def generate_story(prompt):
 
 # Step 2: Function to generate images using DALL-E
 def generate_images_with_dalle(story, image_prompt, size="1024x1024"):
-    dalle_prompt = f"{image_prompt}\n\nStory: '{story}'"
+    dalle_prompt = f"{image_prompt}\n\nStory:\n\n'{story}'"
     response = client.images.generate(
         model="dall-e-3",
         prompt=dalle_prompt,
@@ -63,8 +66,6 @@ def save_image(image_url):
 # Step 4: Streamlit web app interface
 st.title("Toddler Picture Story Generator")
 
-
-
 # Function to load API key from .env file
 def load_api_key_from_env():
     load_dotenv()
@@ -87,7 +88,6 @@ if api_key:
 else:
     st.error("Please provide a valid OpenAI API key to proceed.")
 
-    
 # Text input for story prompt
 story_idea = st.text_area("Please input the Story Idea, keywords or short sentence:", height=50)
 
@@ -97,9 +97,17 @@ default_story_prompt = f"""Create a simple story of about 100 words in American 
 story_prompt = st.text_area("Modify the story prompt if needed:", value=default_story_prompt, height=210)
 
 # Text area to display and modify image prompt template
-default_image_prompt = """Generate an image based on the following story. The style should be simple and playful, with soft, warm colors. The image should be suitable for a 2-year-old child, with clear, easy-to-recognize elements. Ensure that the scene evokes warmth, friendliness, and is rich in visual storytelling, but not overly complex. The composition should be balanced and visually engaging, with a focus on creating a comforting and imaginative atmosphere for storytelling."""
+default_image_prompt = """Generate an image based on the following story. The style should be simple and playful, cartoonish, with soft, warm colors, and minimalistic details. The image should be suitable for a 2-year-old child, with clear, easy-to-recognize elements. Ensure that the scene evokes warmth, friendliness, and is rich in visual storytelling, but not overly complex. The composition should be balanced and visually engaging, with a focus on creating a comforting and imaginative atmosphere for storytelling."""
 
 image_prompt = st.text_area("Modify the image prompt if needed:", value=default_image_prompt, height=150)
+
+# Image size selection
+image_sizes = {
+    "Square (1024x1024)": "1024x1024",
+    "Landscape (1792x1024)": "1792x1024",
+    "Portrait (1024x1792)": "1024x1792"
+}
+selected_image_size = st.selectbox("Select image size:", list(image_sizes.keys()))
 
 # List of voices for selection
 voices = [
@@ -148,10 +156,14 @@ def generate_story_content():
     st.session_state.image_version = 1
     st.session_state.audio_version = 1
 
-# Function to generate image
+# Update the generate_images_with_dalle function call
 def generate_image_content():
     if st.session_state.story:
-        st.session_state.image_url = generate_images_with_dalle(st.session_state.story, image_prompt)
+        st.session_state.image_url = generate_images_with_dalle(
+            st.session_state.story, 
+            image_prompt, 
+            size=image_sizes[selected_image_size]
+        )
         image_file = save_image(st.session_state.image_url)
         st.session_state.image_version += 1
     else:
@@ -178,7 +190,7 @@ if st.button('Generate Story, Image, and Audio'):
 # Display story in a text area with auto-adjusting height
 if st.session_state.story:
     story_lines = st.session_state.story.count('\n') + 1
-    st.text_area("Generated Story:", value=st.session_state.story, height=story_lines * 25, key="story_display", max_chars=None)
+    st.text_area("Story:", value=st.session_state.story, height=story_lines * 25, key="story_display", max_chars=None)
 
 # Display image with a frame
 if st.session_state.image_url:
