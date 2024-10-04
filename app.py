@@ -12,6 +12,11 @@ ImageSize = Literal["1024x1024", "1792x1024", "1024x1792"]
 
 load_dotenv()
 
+# Create necessary directories if they don't exist
+os.makedirs("./audios", exist_ok=True)
+os.makedirs("./texts", exist_ok=True)
+os.makedirs("./images", exist_ok=True)
+
 # Function definitions
 
 def generate_story(prompt):
