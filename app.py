@@ -12,7 +12,8 @@ ImageSize = Literal["1024x1024", "1792x1024", "1024x1792"]
 
 load_dotenv()
 
-# Step 1: Function to generate a 100-word story
+# Function definitions
+
 def generate_story(prompt):
     response = client.chat.completions.create(
         model="gpt-4o-mini",
@@ -24,7 +25,6 @@ def generate_story(prompt):
     )
     return response.choices[0].message.content.strip()
 
-# Step 2: Function to generate images using DALL-E
 def generate_images_with_dalle(story, image_prompt, size="1024x1024"):
     dalle_prompt = f"{image_prompt}\n\nStory:\n\n'{story}'"
     response = client.images.generate(
@@ -36,7 +36,6 @@ def generate_images_with_dalle(story, image_prompt, size="1024x1024"):
     )
     return response.data[0].url
 
-# Step 3: Function to generate audio using Edge TTS
 async def generate_audio(story, voice):
     communicate = edge_tts.Communicate(story, voice)
     audio_filename = f"./audios/audio-{st.session_state.timestamp}-{voice}.mp3"
@@ -46,7 +45,6 @@ async def generate_audio(story, voice):
 def generate_audio_sync(story, voice):
     return asyncio.run(generate_audio(story, voice))
 
-# Function to save story to file
 def save_story(story):
     filename = f"./texts/story-{st.session_state.timestamp}.txt"
     os.makedirs(os.path.dirname(filename), exist_ok=True)
@@ -54,7 +52,6 @@ def save_story(story):
         f.write(story)
     return filename
 
-# Function to save image
 def save_image(image_url):
     filename = f"./images/image-{st.session_state.timestamp}-v{st.session_state.image_version}.png"
     os.makedirs(os.path.dirname(filename), exist_ok=True)
@@ -63,13 +60,42 @@ def save_image(image_url):
         f.write(response.content)
     return filename
 
-# Step 4: Streamlit web app interface
-st.title("Toddler Picture Story Generator")
-
-# Function to load API key from .env file
 def load_api_key_from_env():
     load_dotenv()
     return os.getenv("OPENAI_API_KEY")
+
+def generate_story_content():
+    st.session_state.timestamp = datetime.now().strftime("%Y%m%d.%H%M%S")
+    st.session_state.story = generate_story(story_prompt)
+    story_file = save_story(st.session_state.story)
+    st.session_state.image_version = 1
+    st.session_state.audio_version = 1
+
+def generate_image_content():
+    if st.session_state.story:
+        st.session_state.image_url = generate_images_with_dalle(
+            st.session_state.story, 
+            image_prompt, 
+            size=image_sizes[selected_image_size]
+        )
+        image_file = save_image(st.session_state.image_url)
+        st.session_state.image_version += 1
+    else:
+        st.write("Please generate a story first.")
+
+def generate_audio_content():
+    if st.session_state.story:
+        if st.session_state.audio_file:
+            os.remove(st.session_state.audio_file)
+        st.session_state.audio_file = generate_audio_sync(st.session_state.story, selected_voice)
+        st.session_state.last_voice = selected_voice
+        st.session_state.last_story = st.session_state.story
+        st.session_state.audio_version += 1
+    else:
+        st.write("Please generate a story first.")
+
+# Streamlit web app interface
+st.title("Toddler Picture Story Generator")
 
 # Streamlit widget for API key input
 api_key_source = st.radio("Choose OpenAI API Key source:", ("Load from .env", "Enter manually"))
@@ -147,39 +173,6 @@ if 'image_version' not in st.session_state:
     st.session_state.image_version = 1
 if 'audio_version' not in st.session_state:
     st.session_state.audio_version = 1
-
-# Function to generate story
-def generate_story_content():
-    st.session_state.timestamp = datetime.now().strftime("%Y%m%d.%H%M%S")
-    st.session_state.story = generate_story(story_prompt)
-    story_file = save_story(st.session_state.story)
-    st.session_state.image_version = 1
-    st.session_state.audio_version = 1
-
-# Update the generate_images_with_dalle function call
-def generate_image_content():
-    if st.session_state.story:
-        st.session_state.image_url = generate_images_with_dalle(
-            st.session_state.story, 
-            image_prompt, 
-            size=image_sizes[selected_image_size]
-        )
-        image_file = save_image(st.session_state.image_url)
-        st.session_state.image_version += 1
-    else:
-        st.write("Please generate a story first.")
-
-# Function to generate audio
-def generate_audio_content():
-    if st.session_state.story:
-        if st.session_state.audio_file:
-            os.remove(st.session_state.audio_file)
-        st.session_state.audio_file = generate_audio_sync(st.session_state.story, selected_voice)
-        st.session_state.last_voice = selected_voice
-        st.session_state.last_story = st.session_state.story
-        st.session_state.audio_version += 1
-    else:
-        st.write("Please generate a story first.")
 
 # Button to generate all components
 if st.button('Generate Story, Image, and Audio'):
