@@ -123,7 +123,7 @@ default_story_prompt = f"""Create a simple story of about 100 words in American 
 story_prompt = st.text_area("Modify the story prompt if needed:", value=default_story_prompt, height=210)
 
 # Text area to display and modify image prompt template
-default_image_prompt = """Generate an image based on the following story. The style should be simple and playful, cartoonish, with soft, warm colors, and minimalistic details. The image should be suitable for a 2-year-old child, with clear, easy-to-recognize elements. Ensure that the scene evokes warmth, friendliness, and is rich in visual storytelling, but not overly complex. The composition should be balanced and visually engaging, with a focus on creating a comforting and imaginative atmosphere for storytelling."""
+default_image_prompt = """Generate an image based on the following story. The style should be simple and playful, cartoonish, with soft, warm colors, and minimalistic details. The image should be suitable for a 2-year-old child, with clear, easy-to-recognize elements. Ensure that the scene evokes warmth, friendliness, and is rich in visual storytelling, but not overly complex. The composition should be balanced and visually engaging, with a focus on creating a comforting and imaginative atmosphere for storytelling. However, please don't generate any text on the image."""
 
 image_prompt = st.text_area("Modify the image prompt if needed:", value=default_image_prompt, height=150)
 
