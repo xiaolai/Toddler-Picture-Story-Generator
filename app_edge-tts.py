@@ -90,8 +90,10 @@ def generate_image_content():
 
 def generate_audio_content():
     if st.session_state.story:
-        if st.session_state.audio_file:
-            os.remove(st.session_state.audio_file)
+        # Delete previous audio file
+        # if st.session_state.audio_file:
+        #     os.remove(st.session_state.audio_file)
+        
         st.session_state.audio_file = generate_audio_sync(st.session_state.story, selected_voice)
         st.session_state.last_voice = selected_voice
         st.session_state.last_story = st.session_state.story

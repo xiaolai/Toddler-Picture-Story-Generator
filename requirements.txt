@@ -1,5 +1,6 @@
 streamlit
 openai
 python-dotenv
-edge_tts
+edge-tts
+azure-cognitiveservices-speech
 requests
